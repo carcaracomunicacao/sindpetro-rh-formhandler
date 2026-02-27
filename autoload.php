@@ -1,4 +1,6 @@
 <?php
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
+define('BASE_URL', $protocol . $_SERVER['HTTP_HOST'] . '/spfh/');
 
 spl_autoload_register(function ($class) {
     // Converte namespace em caminho
