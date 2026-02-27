@@ -45,6 +45,7 @@ $header->setTitle($form['title'])
             <div class="col-12 col-md-8 col-lg-7 my-5">
 
                 <div class="card shadow-sm border-0">
+                    <img src="/assets/img/header.jpg" alt="">
                     <div class="card-body p-4 p-md-5">
                         <h2 class="text-center mb-4 text-primary fw-bold">
                             <?= htmlspecialchars($form['title']) ?>
@@ -83,6 +84,22 @@ $header->setTitle($form['title'])
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
+
+                                    <?php elseif ($field['field_type'] === 'radio'): ?>
+                                        <div class="mt-2">
+                                            <?php foreach ($field['options'] as $opt): ?>
+                                                <div class="form-check mb-2">
+                                                    <input class="form-check-input" type="radio"
+                                                        name="field_<?= $field['id'] ?>"
+                                                        id="opt_<?= $opt['id'] ?>"
+                                                        value="<?= htmlspecialchars($opt['option_value']) ?>"
+                                                        <?= $field['is_required'] ? 'required' : '' ?>>
+                                                    <label class="form-check-label" for="opt_<?= $opt['id'] ?>">
+                                                        <?= htmlspecialchars($opt['option_label']) ?>
+                                                    </label>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
 
                                     <?php elseif ($field['field_type'] === 'file'): ?>
                                         <input type="file" class="form-control" name="field_<?= $field['id'] ?>"
