@@ -1,0 +1,51 @@
+name: SP Form Handler
+
+services:
+  # PHP service (customize the name if needed, e.g., change 'www' to 'app')
+  formhandler_web:
+    build: .
+    ports:
+      - "8000:80"
+    volumes:
+      # Mount your local PHP files to the container's web root (customize paths if needed)
+      - ./../:/var/www/html/
+    depends_on:
+      # This service depends on the database (reference the db service name below)
+      - formhandler_db
+    networks:
+      # Network for inter-container communication (customize if using multiple networks)
+      - app-network
+
+  # MySQL database service (customize the name if needed, e.g., change 'db' to 'mysql-db')
+  formhandler_db:
+    image: mysql:8.0
+    ports:
+      # Host port:Container port (customize host port if 3306 is in use)
+      - "3306:3306"
+    environment:
+      # Database name (customize as needed)
+      MYSQL_DATABASE: spfh
+      # Database user (customize as needed)
+      MYSQL_USER: user
+      # Database password (use a strong password in production)
+      MYSQL_PASSWORD: password
+      # Root password (use a strong password in production)
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      # Persist database data (customize volume name if needed)
+      - db-data:/var/lib/mysql
+      # Optional: Mount initial SQL scripts (customize path if needed)
+      - ./dump:/docker-entrypoint-initdb.d
+    networks:
+      # Network reference (must match the one above)
+      - app-network
+
+# Named volumes for data persistence
+volumes:
+  # Customize volume name if needed
+  db-data:
+
+# Custom network for services
+networks:
+  # Customize network name if needed
+  app-network:
