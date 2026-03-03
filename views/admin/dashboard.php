@@ -26,7 +26,7 @@ $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page < 1) $page = 1;
 $offset = ($page - 1) * $limit;
 
-$formId = isset($_GET['form_id']) ? (int)$_GET['form_id'] : null;
+$formId = isset($_GET['form_id']) ? (int)$_GET['form_id'] : 1;
 $searchTerm = isset($_GET['search']) ? $_GET['search'] : null;
 
 $forms = $submissions = $repo->getAllSubmissionsPaginated($limit, $offset, $searchTerm, $formId);
