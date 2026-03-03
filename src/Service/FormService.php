@@ -20,4 +20,11 @@ class FormService extends Service
         $this->fields = $fields;
         $this->fieldOptions = $fieldOptions;
     }
+
+    public function getAllActiveForms()
+    {
+        return $this->getBy([
+            "is_active" => 1,
+        ]);
+    }
 }

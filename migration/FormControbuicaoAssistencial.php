@@ -5,8 +5,8 @@
 INSERT INTO spfh_forms (uuid, title, description, is_active) 
 VALUES (
     UUID(), 
-    'Formulário de Contribuição Assistencial para Grevistas', 
-    'A coleta de dados aqui informados será para fins de apuração dos valores e identificação de pessoas com vista do eventual reembolso do valor descontado dos grevistas.\n\nSó será aceita uma resposta por CPF. Em caso de resposta duplicada, será considerada apenas a primeira resposta.', 
+    'Formulário de Solicitação de Reembolso para Grevistas Associados', 
+    '<p>A coleta dos dados aqui informados será para fins de apuração dos valores e identificação de pessoas com vista do eventual reembolso do valor descontado dos grevistas.</p><p>Só será aceita UMA RESPOSTA POR CPF. Em caso de resposta duplicada, a primeira resposta é a que será considerada.</p><p>Conheça mais:</p><p>Entenda a Contribuição Assistencial e o regramento para a reposição das perdas dos grevistas 👉<br/><a href="https://sindipetro.org.br/contribuicao-assistencial-greve/">https://sindipetro.org.br/contribuicao-assistencial-greve/</a></p><p>Em caso de dúvidas, mande email para: <a href="mailto:contato@sindipetro.org.br">contato@sindipetro.org.br</a></p>', 
     1
 );
 
