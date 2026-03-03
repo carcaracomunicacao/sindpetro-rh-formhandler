@@ -47,11 +47,11 @@ $header->setTitle($form['title'])
                 <div class="card shadow-sm border-0">
                     <img src="/assets/img/header.jpg" alt="">
                     <div class="card-body p-4 p-md-5">
-                        <h2 class="text-center mb-4 text-primary fw-bold">
+                        <h2 class="text-start mb-4 text-primary fw-bold">
                             <?= htmlspecialchars($form['title']) ?>
                         </h2>
-                        <p class="text-muted text-center mb-5">
-                            <?= htmlspecialchars($form['description']) ?>
+                        <p class="text-muted text-start mb-5" style="text-align: left">
+                            <?= $form['description'] ?>
                         </p>
 
                         <form id="mainForm" enctype="multipart/form-data">
@@ -106,6 +106,12 @@ $header->setTitle($form['title'])
                                             <?= $field['is_required'] ? 'required' : '' ?> accept="application/pdf">
                                         <div class="form-text small text-danger mt-1">Apenas arquivos PDF (Máx. 2MB).</div>
 
+                                    <?php elseif ($field['field_type'] === 'email'): ?>
+                                        <input type="email"
+                                            class="form-control"
+                                            name="field_<?= $field['id'] ?>"
+                                            placeholder="<?= htmlspecialchars($field['placeholder']) ?>"
+                                            <?= $field['is_required'] ? 'required' : '' ?>>
                                     <?php else: ?>
                                         <?php
                                         // Lógica para definir se o teclado no celular deve ser numérico
@@ -215,7 +221,7 @@ $header->setTitle($form['title'])
                             text: data.message,
                             confirmButtonColor: '#dc3545' // Seu vermelho base
                         }).then(() => {
-                            window.location.href = '/views/thanks.php';
+                            window.location.href = '/views/thanks.php?id=' + data.form_uuid;
                         });
                     } else {
                         Swal.fire({

@@ -29,7 +29,8 @@ try {
     echo json_encode([
         'success' => true,
         'message' => 'Sua ficha foi registrada com sucesso!',
-        'id' => $submissionId
+        'id' => $submissionId,
+        'form_uuid' => $formUuid
     ]);
 } catch (\Exception $e) {
     // Retorna o erro amigável para o SweetAlert mostrar
