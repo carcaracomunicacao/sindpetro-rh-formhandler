@@ -56,6 +56,7 @@ $header->setTitle($form['title'])
 
                         <form id="mainForm" enctype="multipart/form-data">
                             <input type="hidden" name="form_id" value="<?= $form['id'] ?>">
+                            <input type="hidden" name="form_uuid" value="<?= htmlspecialchars($formUuid) ?>">
 
                             <?php foreach ($fields as $field): ?>
                                 <div class="mb-4">
