@@ -48,7 +48,7 @@ $header->setTitle('Admin')
     <div class="container-fluid mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="text-primary fw-bold">Submissões: Cadastro de Greve</h2>
-            <a href="../../src/Controller/ExportCsvController.php?form_id=<?= $formId ?>"
+            <a href="../../src/Controller/ExportCSVController.php?form_id=<?= $formId ?>"
                 class="btn btn-success btn-sm <?= !$formId ? 'disabled' : '' ?>">
                 <i class="bi bi-file-earmark-excel"></i> Exportar CSV
             </a>
