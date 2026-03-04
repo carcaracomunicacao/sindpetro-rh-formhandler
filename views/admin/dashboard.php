@@ -35,6 +35,8 @@ $header->setTitle('Admin')
 
 <body class="bg-light">
 
+    <?php include __DIR__ . '../../components/navbar.php'; ?>
+
     <div class="container-fluid mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="text-primary fw-bold">Submissões: Cadastro de Greve</h2>
@@ -119,7 +121,7 @@ $header->setTitle('Admin')
     </div>
 
     <!-- Scripts -->
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.querySelectorAll('.btn-view-details').forEach(button => {
             button.addEventListener('click', function() {
