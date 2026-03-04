@@ -9,6 +9,14 @@ class UserRepository extends Repository
     protected string $table = 'spfh_users';
 
     /**
+     * Busca um usuário pelo nickname
+     */
+    public function findByNickname(string $nickname): array|false
+    {
+        return $this->findBy(['nickname' => $nickname], single: true);
+    }
+
+    /**
      * Busca um usuário pelo email
      */
     public function findByEmail(string $email): array|false
@@ -78,6 +86,21 @@ class UserRepository extends Repository
             $row['roles'] = $row['roles'] ? explode(',', $row['roles']) : [];
             return $row;
         }, $rows);
+    }
+
+    /**
+     * Verifica se um nickname já está em uso (opcionalmente excluindo um ID)
+     */
+    public function nicknameExists(string $nickname, ?int $excludeId = null): bool
+    {
+        if ($excludeId) {
+            $sql = "SELECT 1 FROM {$this->table} WHERE nickname = :nickname AND id != :id LIMIT 1";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['nickname' => $nickname, 'id' => $excludeId]);
+            return (bool) $stmt->fetchColumn();
+        }
+
+        return $this->existsBy(['nickname' => $nickname]);
     }
 
     /**

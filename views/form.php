@@ -222,7 +222,7 @@ $header->setTitle($form['title'])
                             text: data.message,
                             confirmButtonColor: '#dc3545' // Seu vermelho base
                         }).then(() => {
-                            window.location.href = '/views/thanks.php?id=' + data.form_uuid;
+                            window.location.href = '/agradecimento?id=' + data.form_uuid;
                         });
                     } else {
                         Swal.fire({

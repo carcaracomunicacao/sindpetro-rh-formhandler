@@ -14,5 +14,5 @@ $auth         = new AuthService($userRepo, $userRoleRepo);
 
 $auth->logout();
 
-header('Location: /admin/login.php');
+header('Location: /login');
 exit;

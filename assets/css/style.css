@@ -1,23 +1,41 @@
-:root {
-    /* Sobrescreve a cor primária do Bootstrap para Vermelho */
-    --bs-primary: #dc3545; 
-    --bs-primary-rgb: 220, 53, 69;
-    
-    /* Cor de destaque para botões e links */
-    --bs-link-color: #dc3545;
-    --bs-link-hover-color: #a71d2a;
-}
+  :root {
+      --bs-primary: rgb(255, 133, 0);
+      --bs-primary-rgb: 255, 133, 0;
+      --bs-btn-bg: rgb(255, 133, 0);
+      --bs-link-color: rgb(255, 133, 0);
+  }
 
-/* Ajuste manual para o botão primary caso ele não pegue a variável */
-.btn-primary {
-    --bs-btn-bg: #dc3545;
-    --bs-btn-border-color: #dc3545;
-    --bs-btn-hover-bg: #a71d2a;
-    --bs-btn-hover-border-color: #a71d2a;
-    --bs-btn-active-bg: #a71d2a;
-}
+  .btn-primary {
+      --bs-btn-bg: rgb(255, 133, 0);
+      --bs-btn-border-color: rgb(255, 133, 0);
+      --bs-btn-hover-bg: rgb(230, 115, 0);
+      --bs-btn-hover-border-color: rgb(220, 108, 0);
+      --bs-btn-active-bg: rgb(210, 100, 0);
+      --bs-btn-color: #fff;
+      --bs-btn-hover-color: #fff;
+      --bs-btn-active-color: #fff;
+  }
 
-/* Cor do título que colocamos como text-primary no form.php */
-.text-primary {
-    color: #dc3545 ! aspiration;
-}
+  .btn-outline-primary {
+      --bs-btn-color: rgb(255, 133, 0);
+      --bs-btn-border-color: rgb(255, 133, 0);
+      --bs-btn-hover-bg: rgb(255, 133, 0);
+      --bs-btn-hover-border-color: rgb(255, 133, 0);
+      --bs-btn-hover-color: #fff;
+  }
+
+  .text-primary {
+      color: rgb(255, 133, 0) !important;
+  }
+
+  .bg-primary {
+      background-color: rgb(255, 133, 0) !important;
+  }
+
+  .border-primary {
+      border-color: rgb(255, 133, 0) !important;
+  }
+
+  .navbar.bg-primary {
+      background-color: rgb(255, 133, 0) !important;
+  }

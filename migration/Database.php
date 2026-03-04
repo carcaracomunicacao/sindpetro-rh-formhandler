@@ -69,18 +69,19 @@ INSERT INTO spfh_roles (name, description) VALUES
 ('editor', 'Cria e edita formulários'),
 ('viewer', 'Apenas visualiza formulários e respostas');
 
-
 CREATE TABLE spfh_users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     uuid CHAR(36) NOT NULL UNIQUE,
     name VARCHAR(150) NOT NULL,
+    nickname VARCHAR(50) NOT NULL UNIQUE, -- Usado para login
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
+    remember_token VARCHAR(64) NULL,
+    remember_token_expires DATETIME NULL,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 
 CREATE TABLE spfh_user_roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -91,5 +92,5 @@ CREATE TABLE spfh_user_roles (
     FOREIGN KEY (user_id) REFERENCES spfh_users(id) ON DELETE CASCADE,
     FOREIGN KEY (role_id) REFERENCES spfh_roles(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
+ 
 */

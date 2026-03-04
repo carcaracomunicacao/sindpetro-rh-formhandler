@@ -8,32 +8,31 @@ use App\Utils\HeaderBuilder;
 
 require_once __DIR__ . '../../autoload.php';
 
-$db              = (new PDOConnection())->getPDO();
-$userRepository  = new UserRepository($db);
-$userRoleRepo    = new UserRoleRepository($db);
-$auth            = new AuthService($userRepository, $userRoleRepo);
+$db           = (new PDOConnection())->getPDO();
+$userRepo     = new UserRepository($db);
+$userRoleRepo = new UserRoleRepository($db);
+$auth         = new AuthService($userRepo, $userRoleRepo);
 
-// Se já estiver logado, redireciona direto
 if ($auth->check()) {
     $auth->redirectToDashboard();
 }
 
-$error    = null;
-$oldEmail = '';
+$error       = null;
+$oldNickname = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email    = trim($_POST['email'] ?? '');
+    $nickname = trim($_POST['nickname'] ?? '');
     $password = $_POST['password'] ?? '';
     $remember = isset($_POST['remember']);
-    $oldEmail = htmlspecialchars($email);
+    $oldNickname = htmlspecialchars($nickname);
 
     try {
-        $success = $auth->login($email, $password, $remember);
+        $success = $auth->login($nickname, $password, $remember);
 
         if ($success) {
             $auth->redirectToDashboard();
         } else {
-            $error = 'E-mail ou senha incorretos.';
+            $error = 'Nickname ou senha incorretos.';
         }
     } catch (\InvalidArgumentException $e) {
         $error = $e->getMessage();
@@ -47,25 +46,23 @@ $header->setTitle('Login — Admin')
     ->setDescription('Acesso à área administrativa');
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR">
-<?php echo $header->render(); ?>
+<html lang="<?= $header->getLang() ?>">
+<?php $header->render(); ?>
 
 <body class="bg-light">
 
     <div class="min-vh-100 d-flex flex-column justify-content-center align-items-center px-3 py-5">
 
-        <!-- Card de Login -->
         <div class="card shadow-sm border-0 w-100" style="max-width: 420px;">
 
-            <!-- Topo do card -->
             <div class="card-header bg-white border-bottom text-center py-4">
-                <h4 class="fw-bold mb-0">Área Administrativa</h4>
+                <img src="/assets/img/sindpedro-logo.jpg" style="padding:16px; max-width:65%; margin: auto" />
+                <h4 class="fw-bold mb-0">Gestão de Fomulários</h4>
                 <p class="text-muted small mb-0 mt-1">Faça login para continuar</p>
             </div>
 
             <div class="card-body px-4 py-4">
 
-                <!-- Alerta de erro -->
                 <?php if ($error): ?>
                     <div class="alert alert-danger alert-dismissible fade show py-2 small" role="alert">
                         <i class="bi bi-exclamation-circle me-1"></i>
@@ -74,22 +71,21 @@ $header->setTitle('Login — Admin')
                     </div>
                 <?php endif; ?>
 
-                <!-- Formulário -->
                 <form method="POST" action="" novalidate>
 
-                    <!-- E-mail -->
+                    <!-- Nickname -->
                     <div class="mb-3">
-                        <label for="email" class="form-label fw-semibold">E-mail</label>
+                        <label for="nickname" class="form-label fw-semibold">Usuário</label>
                         <input
-                            type="email"
-                            id="email"
-                            name="email"
+                            type="text"
+                            id="nickname"
+                            name="nickname"
                             class="form-control <?= $error ? 'is-invalid' : '' ?>"
-                            value="<?= $oldEmail ?>"
-                            placeholder="seu@email.com.br"
+                            value="<?= $oldNickname ?>"
+                            placeholder="Usuário"
                             required
                             autofocus
-                            autocomplete="email">
+                            autocomplete="username">
                     </div>
 
                     <!-- Senha -->
@@ -104,11 +100,7 @@ $header->setTitle('Login — Admin')
                                 placeholder="••••••••"
                                 required
                                 autocomplete="current-password">
-                            <button
-                                class="btn btn-outline-secondary"
-                                type="button"
-                                id="togglePassword"
-                                title="Mostrar/ocultar senha">
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword" title="Mostrar/ocultar senha">
                                 <i class="bi bi-eye" id="toggleIcon"></i>
                             </button>
                         </div>
@@ -122,7 +114,6 @@ $header->setTitle('Login — Admin')
                         </label>
                     </div>
 
-                    <!-- Botão -->
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg fw-semibold">
                             Entrar
@@ -131,26 +122,21 @@ $header->setTitle('Login — Admin')
 
                 </form>
 
-            </div><!-- /.card-body -->
+            </div>
+        </div>
 
-        </div><!-- /.card -->
-
-        <!-- Assinatura -->
         <p class="text-muted small mt-4 text-center">
             Desenvolvido por
             <a href="https://www.voacarcara.com.br" target="_blank" rel="noopener noreferrer" class="text-muted">
-                Carcará Comunicação
+                Carcara Comunicação
             </a>
         </p>
 
-    </div><!-- /.min-vh-100 -->
+    </div>
 
-    <!-- Bootstrap Icons + JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
-        // Toggle mostrar/ocultar senha
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
         const toggleIcon = document.getElementById('toggleIcon');
