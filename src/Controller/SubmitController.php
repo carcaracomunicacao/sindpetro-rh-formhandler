@@ -30,7 +30,7 @@ try {
         'success' => true,
         'message' => 'Sua ficha foi registrada com sucesso!',
         'id' => $submissionId,
-        'form_uuid' => $formUuid
+        'form_uuid' => $_POST['form_uuid']
     ]);
 } catch (\Exception $e) {
     // Retorna o erro amigável para o SweetAlert mostrar

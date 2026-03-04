@@ -30,31 +30,35 @@ class FormSubmissionsRepository extends Repository
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function getAllSubmissionsPaginated(int $limit, int $offset, ?string $search = null)
+    public function getAllSubmissionsPaginated(int $limit, int $offset, ?string $search = null, ?int $formId = null): array
     {
         $params = [
             'limit' => $limit,
             'offset' => $offset
         ];
 
-        $whereSql = "";
+        $conditions = [];
+
+        if ($formId) {
+            $conditions[] = "s.form_id = :form_id";
+            $params['form_id'] = $formId;
+        }
+
         if ($search) {
-            // Limpamos o termo de busca (especialmente para o CPF)
             $cleanSearch = preg_replace('/\D/', '', $search);
             $searchParam = "%{$search}%";
-
-            // Filtro: Busca submissões que POSSUAM um valor que coincida com a busca
-            $whereSql = " WHERE EXISTS (
+            $conditions[] = "EXISTS (
             SELECT 1 FROM spfh_submission_values sv 
             WHERE sv.submission_id = s.id 
             AND (sv.field_value LIKE :search_raw " . ($cleanSearch ? "OR sv.field_value LIKE :search_clean" : "") . ")
         )";
-
             $params['search_raw'] = $searchParam;
             if ($cleanSearch) {
                 $params['search_clean'] = "%{$cleanSearch}%";
             }
         }
+
+        $whereSql = !empty($conditions) ? " WHERE " . implode(" AND ", $conditions) : "";
 
         $sql = "SELECT 
                 s.id, 
@@ -79,16 +83,52 @@ class FormSubmissionsRepository extends Repository
             $stmt->bindValue(":{$key}", $val, is_int($val) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
         }
         $stmt->execute();
-
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function getTotalSubmissionsCount(): int
+    public function getTotalSubmissionsCount(?int $formId = null): int
     {
+        if ($formId) {
+            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM {$this->table} WHERE form_id = :form_id");
+            $stmt->bindValue(':form_id', $formId, \PDO::PARAM_INT);
+            $stmt->execute();
+            return (int) $stmt->fetchColumn();
+        }
+
         return (int) $this->pdo->query("SELECT COUNT(*) FROM {$this->table}")->fetchColumn();
     }
-}
 
+    public function getFieldsByFormId(int $formId): array
+    {
+        $stmt = $this->pdo->prepare("
+        SELECT id, label 
+        FROM spfh_form_fields 
+        WHERE form_id = :form_id 
+        ORDER BY id ASC
+    ");
+        $stmt->bindValue(':form_id', $formId, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getAllSubmissionsForExport(int $formId): array
+    {
+        $stmt = $this->pdo->prepare("
+        SELECT 
+            s.id,
+            s.submitted_at,
+            v.field_id,
+            v.field_value
+        FROM {$this->table} s
+        LEFT JOIN spfh_submission_values v ON s.id = v.submission_id
+        WHERE s.form_id = :form_id
+        ORDER BY s.id ASC, v.field_id ASC
+    ");
+        $stmt->bindValue(':form_id', $formId, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+}
 /*
 
 CREATE TABLE spfh_form_submissions (
@@ -97,6 +137,6 @@ CREATE TABLE spfh_form_submissions (
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ip_address VARCHAR(45),
     FOREIGN KEY (form_id) REFERENCES spfh_forms(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci:
 
 */

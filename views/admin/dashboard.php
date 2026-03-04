@@ -1,7 +1,11 @@
 <?php
 
 use App\Connection\PDOConnection;
+use App\Repository\FormRepository;
+use App\Repository\FormFieldsRepository;
+use App\Repository\FieldOptionsRepository;
 use App\Repository\FormSubmissionsRepository;
+use App\Service\FormService;
 use App\Utils\HeaderBuilder;
 
 require_once __DIR__ . '/../../autoload.php';
@@ -9,16 +13,24 @@ require_once __DIR__ . '/../../autoload.php';
 $db = (new PDOConnection())->getPDO();
 $repo = new FormSubmissionsRepository($db);
 
+$formService = new FormService(
+    new FormRepository($db),
+    new FormFieldsRepository($db),
+    new FieldOptionsRepository($db)
+);
+$allForms = $formService->getAllActiveForms();
+
 // Configuração da Paginação
 $limit = 15;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page < 1) $page = 1;
 $offset = ($page - 1) * $limit;
 
+$formId = isset($_GET['form_id']) ? (int)$_GET['form_id'] : 1;
 $searchTerm = isset($_GET['search']) ? $_GET['search'] : null;
 
-$submissions = $repo->getAllSubmissionsPaginated($limit, $offset, $searchTerm);
-$totalRows = $repo->getTotalSubmissionsCount();
+$forms = $submissions = $repo->getAllSubmissionsPaginated($limit, $offset, $searchTerm, $formId);
+$totalRows = $repo->getTotalSubmissionsCount($formId);
 $totalPages = ceil($totalRows / $limit);
 
 // 3. Configura o Cabeçalho (SEO)
@@ -26,8 +38,6 @@ $header = new HeaderBuilder();
 $header->setTitle('Admin')
     ->setDescription('Visualização de respostas');
 
-// echo '<pre>';
-// var_dump($submissions);
 ?>
 <!DOCTYPE html>
 <html lang="<?= $header->getLang() ?>">
@@ -40,11 +50,40 @@ $header->setTitle('Admin')
     <div class="container-fluid mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="text-primary fw-bold">Submissões: Cadastro de Greve</h2>
-            <button class="btn btn-success btn-sm"><i class="bi bi-file-earmark-excel"></i> Exportar CSV</button>
+            <a href="../../src/Controller/ExportCSVController.php?form_id=<?= $formId ?>"
+                class="btn btn-success btn-sm <?= !$formId ? 'disabled' : '' ?>">
+                <i class="bi bi-file-earmark-excel"></i> Exportar CSV
+            </a>
         </div>
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body">
                 <form action="" method="GET" class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <select name="form_id" class="form-select" required onchange="this.form.submit()">
+                            <option value="">Selecione um formulário...</option>
+                            <?php foreach ($allForms as $f): ?>
+                                <option value="<?= $f['id'] ?>" <?= $formId == $f['id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($f['title']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-search text-muted"></i>
+                            </span>
+                            <input type="text" name="search" class="form-control border-start-0"
+                                placeholder="Buscar por Nome ou CPF..."
+                                value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
+                                <?= !$formId ? 'disabled' : '' ?>>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-2 d-grid">
+                        <button type="submit" class="btn btn-primary" <?= !$formId ? 'disabled' : '' ?>>Filtrar</button>
+                    </div>
+                </form>
+                <!-- <form action="" method="GET" class="row g-3">
                     <div class="col-12 col-md-10">
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0">
@@ -58,7 +97,7 @@ $header->setTitle('Admin')
                     <div class="col-12 col-md-2 d-grid">
                         <button type="submit" class="btn btn-primary">Filtrar</button>
                     </div>
-                </form>
+                </form> -->
             </div>
         </div>
         <div class="card border-0 shadow-sm">
