@@ -68,7 +68,7 @@ $header->setTitle('Admin — ' . ($formTitle ?? 'Submissões'))
     <div class="container-fluid mt-4">
 
         <!-- Título com chapéu -->
-        <div class="d-flex justify-content-between align-items-start mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-start gap-3 mb-4">
             <div>
                 <p class="text-muted small fw-semibold text-uppercase mb-0">
                     <i class="bi bi-inbox me-1"></i>Submissões
@@ -80,10 +80,6 @@ $header->setTitle('Admin — ' . ($formTitle ?? 'Submissões'))
                     ?>
                 </h2>
             </div>
-            <a href="../../src/Controller/ExportCSVController.php?form_id=<?= $formId ?>"
-                class="btn btn-success btn-sm <?= !$formId ? 'disabled' : '' ?>">
-                <i class="bi bi-file-earmark-excel"></i> Exportar CSV
-            </a>
         </div>
 
         <div class="card border-0 shadow-sm mb-4">
@@ -99,7 +95,7 @@ $header->setTitle('Admin — ' . ($formTitle ?? 'Submissões'))
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-4">
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0">
                                 <i class="bi bi-search text-muted"></i>
@@ -110,8 +106,16 @@ $header->setTitle('Admin — ' . ($formTitle ?? 'Submissões'))
                                 <?= !$formId ? 'disabled' : '' ?>>
                         </div>
                     </div>
-                    <div class="col-12 col-md-2 d-grid">
-                        <button type="submit" class="btn btn-primary" <?= !$formId ? 'disabled' : '' ?>>Filtrar</button>
+                    <div class="col-6 col-md-2 d-grid">
+                        <button type="submit" class="btn btn-primary" <?= !$formId ? 'disabled' : '' ?>>
+                            Filtrar
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-2 d-grid">
+                        <a href="../../src/Controller/ExportCSVController.php?form_id=<?= $formId ?>"
+                            class="btn btn-success <?= !$formId ? 'disabled' : '' ?>">
+                            <i class="bi bi-file-earmark-excel"></i> Exportar CSV
+                        </a>
                     </div>
                 </form>
             </div>
@@ -120,13 +124,13 @@ $header->setTitle('Admin — ' . ($formTitle ?? 'Submissões'))
         <div class="card border-0 shadow-sm">
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover align-middle mb-0 d-none d-md-table">
                         <thead class="bg-light">
                             <tr>
                                 <th>ID</th>
                                 <th>Nome</th>
                                 <th>CPF</th>
-                                <td>Formulário</td>
+                                <th>Formulário</th>
                                 <th>Data</th>
                                 <th class="text-center">Documento</th>
                                 <th>Ações</th>
@@ -159,45 +163,45 @@ $header->setTitle('Admin — ' . ($formTitle ?? 'Submissões'))
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+
+                    <!-- Versão mobile: cards -->
+                    <div class="d-md-none">
+                        <?php foreach ($submissions as $sub): ?>
+                            <div class="border-bottom px-3 py-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="fw-semibold mb-0"><?= htmlspecialchars($sub['nome']) ?></p>
+                                        <p class="text-muted small mb-1"><?= $sub['cpf'] ?></p>
+                                        <p class="text-muted small mb-0">
+                                            <i class="bi bi-calendar2 me-1"></i><?= date('d/m/Y H:i', strtotime($sub['submitted_at'])) ?>
+                                        </p>
+                                    </div>
+                                    <span class="badge bg-light text-muted border">#<?= $sub['id'] ?></span>
+                                </div>
+                                <div class="d-flex gap-2 mt-2">
+                                    <button class="btn btn-sm btn-outline-primary btn-view-details w-100" data-id="<?= $sub['id'] ?>">
+                                        <i class="bi bi-search"></i> Detalhes
+                                    </button>
+                                    <?php if ($sub['arquivos_pdf']): ?>
+                                        <a href="/storage/<?= $sub['form_uuid'] ?>/<?= $sub['arquivos_pdf'] ?>"
+                                            target="_blank" class="btn btn-sm btn-outline-danger w-100">
+                                            <i class="bi bi-file-pdf"></i> PDF
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
         </div>
-
     </div>
-
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasDetails" aria-labelledby="offcanvasDetailsLabel" style="width: 500px;">
-        <div class="offcanvas-header bg-light">
-            <h5 class="offcanvas-title fw-bold text-primary" id="offcanvasDetailsLabel">Detalhes da Submissão</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body" id="detailsContent">
-            <div class="text-center mt-5">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-2 text-muted">Carregando dados...</p>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.querySelectorAll('.btn-view-details').forEach(button => {
             button.addEventListener('click', function() {
                 const id = this.getAttribute('data-id');
-                const contentDiv = document.getElementById('detailsContent');
-                const offcanvasElement = document.getElementById('offcanvasDetails');
-                const bsOffcanvas = new bootstrap.Offcanvas(offcanvasElement);
-
-                contentDiv.innerHTML = '<div class="text-center mt-5"><div class="spinner-border text-primary"></div></div>';
-                bsOffcanvas.show();
-
-                fetch(`../../src/Service/GetSubmissionDetailed.php?id=${id}`)
-                    .then(response => response.text())
-                    .then(html => {
-                        contentDiv.innerHTML = html;
-                    })
-                    .catch(() => {
-                        contentDiv.innerHTML = '<div class="alert alert-danger">Erro ao carregar detalhes.</div>';
-                    });
+                window.location.href = '/admin/submissions/' + id;
             });
         });
     </script>

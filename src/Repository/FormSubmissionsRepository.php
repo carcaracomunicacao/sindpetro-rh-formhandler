@@ -128,6 +128,66 @@ class FormSubmissionsRepository extends Repository
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+    public function findByIdWithValues(int $id): array|false
+    {
+        $sql = "
+        SELECT 
+            s.id,
+            s.form_id,
+            s.submitted_at,
+            s.ip_address,
+            s.user_agent,
+            f.title AS form_title,
+            f.uuid  AS form_uuid
+        FROM spfh_form_submissions s
+        INNER JOIN spfh_forms f ON f.id = s.form_id
+        WHERE s.id = :id
+        LIMIT 1
+    ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        $submission = $stmt->fetch();
+
+        if (!$submission) {
+            return false;
+        }
+
+        $sqlValues = "
+        SELECT
+            sv.id           AS value_id,
+            sv.field_id,
+            sv.field_value,
+            ff.label,
+            ff.field_type,
+            ff.display_order
+        FROM spfh_submission_values sv
+        INNER JOIN spfh_form_fields ff ON ff.id = sv.field_id
+        WHERE sv.submission_id = :submission_id
+        ORDER BY ff.display_order ASC
+    ";
+
+        $stmt = $this->pdo->prepare($sqlValues);
+        $stmt->execute(['submission_id' => $id]);
+        $submission['values'] = $stmt->fetchAll();
+
+        return $submission;
+    }
+
+    /**
+     * Atualiza um valor específico de uma submissão
+     */
+    public function updateValue(int $valueId, string $newValue): bool
+    {
+        $stmt = $this->pdo->prepare("
+        UPDATE spfh_submission_values 
+        SET field_value = :value 
+        WHERE id = :id
+    ");
+
+        return $stmt->execute(['value' => $newValue, 'id' => $valueId]);
+    }
 }
 /*
 
