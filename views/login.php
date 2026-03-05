@@ -42,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $header = new HeaderBuilder();
-$header->setTitle('Login — Admin')
-    ->setDescription('Acesso à área administrativa');
+$header->setTitle('Login | Formulários SindiPetro-RJ')
+    ->setDescription('Acesso à área administrativa da gestão de formulários');
 ?>
 <!DOCTYPE html>
 <html lang="<?= $header->getLang() ?>">
