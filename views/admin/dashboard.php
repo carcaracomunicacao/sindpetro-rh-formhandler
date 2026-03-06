@@ -31,7 +31,9 @@ $formService = new FormService(
 $allForms = $formService->getAllActiveForms();
 
 // Configuração da Paginação
-$limit  = 15;
+$limit = isset($_GET['per_page']) && in_array((int)$_GET['per_page'], [15, 30, 60, 120, 240])
+    ? (int)$_GET['per_page']
+    : 15;
 $page   = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 if ($page < 1) $page = 1;
 $offset = ($page - 1) * $limit;
@@ -105,6 +107,15 @@ $header->setTitle('Admin — ' . ($formTitle ?? 'Submissões'))
                                 value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
                                 <?= !$formId ? 'disabled' : '' ?>>
                         </div>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <select name="per_page" class="form-select" onchange="this.form.submit()" <?= !$formId ? 'disabled' : '' ?>>
+                            <?php foreach ([15, 30, 60, 120, 240] as $opt): ?>
+                                <option value="<?= $opt ?>" <?= $limit == $opt ? 'selected' : '' ?>>
+                                    <?= $opt ?> por página
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="col-6 col-md-2 d-grid">
                         <button type="submit" class="btn btn-primary" <?= !$formId ? 'disabled' : '' ?>>
