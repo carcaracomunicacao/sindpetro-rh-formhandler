@@ -204,6 +204,76 @@ $header->setTitle('Admin — ' . ($formTitle ?? 'Submissões'))
                         <?php endforeach; ?>
                     </div>
                 </div>
+                <!-- Paginação -->
+                <?php if ($totalPages > 1): ?>
+                    <div class="d-flex justify-content-center mt-4">
+                        <nav>
+                            <ul class="pagination">
+
+                                <!-- Anterior -->
+                                <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $page - 1 ?>&form_id=<?= $formId ?>&per_page=<?= $limit ?>&search=<?= urlencode($_GET['search'] ?? '') ?>">
+                                        &laquo;
+                                    </a>
+                                </li>
+
+                                <?php
+                                // Mostra no máximo 5 páginas ao redor da atual
+                                $start = max(1, $page - 2);
+                                $end   = min($totalPages, $page + 2);
+                                ?>
+
+                                <!-- Primeira página + reticências -->
+                                <?php if ($start > 1): ?>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1&form_id=<?= $formId ?>&per_page=<?= $limit ?>&search=<?= urlencode($_GET['search'] ?? '') ?>">1</a>
+                                    </li>
+                                    <?php if ($start > 2): ?>
+                                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+
+                                <!-- Páginas do meio -->
+                                <?php for ($i = $start; $i <= $end; $i++): ?>
+                                    <li class="page-item <?= $i === $page ? 'active' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $i ?>&form_id=<?= $formId ?>&per_page=<?= $limit ?>&search=<?= urlencode($_GET['search'] ?? '') ?>">
+                                            <?= $i ?>
+                                        </a>
+                                    </li>
+                                <?php endfor; ?>
+
+                                <!-- Última página + reticências -->
+                                <?php if ($end < $totalPages): ?>
+                                    <?php if ($end < $totalPages - 1): ?>
+                                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                                    <?php endif; ?>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=<?= $totalPages ?>&form_id=<?= $formId ?>&per_page=<?= $limit ?>&search=<?= urlencode($_GET['search'] ?? '') ?>">
+                                            <?= $totalPages ?>
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <!-- Próximo -->
+                                <li class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $page + 1 ?>&form_id=<?= $formId ?>&per_page=<?= $limit ?>&search=<?= urlencode($_GET['search'] ?? '') ?>">
+                                        &raquo;
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <!-- Contador de registros -->
+                    <p class="text-center text-muted small mt-1">
+                        <?php
+                        $from = $offset + 1;
+                        $to   = min($offset + $limit, $totalRows);
+                        ?>
+                        Exibindo <?= $from ?>–<?= $to ?> de <?= $totalRows ?> submissões
+                    </p>
+                <?php endif; ?>
             </div>
         </div>
     </div>
