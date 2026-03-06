@@ -45,6 +45,9 @@ CREATE TABLE spfh_form_submissions (
     FOREIGN KEY (form_id) REFERENCES spfh_forms(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+ALTER TABLE spfh_form_submissions
+ADD COLUMN deleted TINYINT(1) NOT NULL DEFAULT 0;
+
 CREATE TABLE spfh_submission_values (
     id INT AUTO_INCREMENT PRIMARY KEY,
     submission_id INT NOT NULL,

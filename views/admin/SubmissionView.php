@@ -33,6 +33,12 @@ if (!$submission) {
     exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
+    $repo->softDelete($id);
+    header('Location: /admin/dashboard');
+    exit;
+}
+
 $canEdit = $auth->hasAnyRole(['admin', 'owner']);
 
 $name = '';
@@ -76,11 +82,16 @@ $header->setTitle('Submissão #' . $id . ' — Admin')
                     <i class="bi bi-globe me-1"></i><?= htmlspecialchars($submission['ip_address'] ?? '—') ?>
                 </p>
             </div>
-            <?php if ($canEdit): ?>
-                <a href="/admin/submissions/<?= $id ?>/edit" class="btn btn-primary">
-                    <i class="bi bi-pencil me-1"></i> Editar
-                </a>
-            <?php endif; ?>
+            <div class="d-fles gap-2 align-items-center">
+                <?php if ($canEdit): ?>
+                    <a href="/admin/submissions/<?= $id ?>/edit" class="btn btn-primary">
+                        <i class="bi bi-pencil me-1"></i> Editar
+                    </a>
+                <?php endif; ?>
+                <button type="button" class="btn btn-outline-danger ms-auto" data-bs-toggle="modal" data-bs-target="#modalDelete">
+                    <i class="bi bi-trash me-1"></i> Excluir submissão
+                </button>
+            </div>
         </div>
 
         <!-- Valores -->
@@ -137,6 +148,33 @@ $header->setTitle('Submissão #' . $id . ' — Admin')
             <?php endif; ?>
         </div>
 
+    </div>
+    <!-- Modal de confirmação de exclusão -->
+    <div class="modal fade" id="modalDelete" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title text-danger">
+                        <i class="bi bi-exclamation-triangle me-1"></i> Excluir submissão
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <hr class="my-0">
+                <div class="modal-body">
+                    <p class="fs-5 mb-4">Tem certeza que deseja excluir a submissão <strong><?= $name . ' (' . $id . ')' ?></strong>?</p>
+                    <p class="text-muted small mb-0">O registro não será apagado do banco, apenas marcado como excluído.</p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form method="POST" action="">
+                        <input type="hidden" name="action" value="delete">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i> Confirmar exclusão
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

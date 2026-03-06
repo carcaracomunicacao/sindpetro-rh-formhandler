@@ -87,7 +87,7 @@ $header->setTitle('Admin — ' . ($formTitle ?? 'Submissões'))
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body">
                 <form action="" method="GET" class="row g-3">
-                    <div class="col-12 col-md-4">
+                    <div class="col-12 col-md-3">
                         <select name="form_id" class="form-select" required onchange="this.form.submit()">
                             <option value="" disabled <?= !$formId ? 'selected' : '' ?>>Selecione um formulário...</option>
                             <?php foreach ($allForms as $f): ?>
@@ -97,7 +97,7 @@ $header->setTitle('Admin — ' . ($formTitle ?? 'Submissões'))
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="col-12 col-md-4">
+                    <div class="col-12 col-md-3">
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0">
                                 <i class="bi bi-search text-muted"></i>

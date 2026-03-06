@@ -38,6 +38,7 @@ class FormSubmissionsRepository extends Repository
         ];
 
         $conditions = [];
+        $conditions[] = "s.deleted = 0";
 
         if ($formId) {
             $conditions[] = "s.form_id = :form_id";
@@ -187,6 +188,33 @@ class FormSubmissionsRepository extends Repository
     ");
 
         return $stmt->execute(['value' => $newValue, 'id' => $valueId]);
+    }
+
+    public function softDelete(int $id): bool
+    {
+        $stmt = $this->pdo->prepare("UPDATE {$this->table} SET deleted = 1 WHERE id = :id");
+        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    public function existsActiveByCpf(int $fieldId, string $cpf, int $formId): bool
+    {
+        $sql = "SELECT 1 
+            FROM spfh_submission_values sv
+            JOIN spfh_form_submissions s ON s.id = sv.submission_id
+            WHERE sv.field_id = :field_id
+            AND sv.field_value = :cpf
+            AND s.form_id = :form_id
+            AND s.deleted = 0
+            LIMIT 1";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':field_id', $fieldId, \PDO::PARAM_INT);
+        $stmt->bindValue(':cpf', $cpf, \PDO::PARAM_STR);
+        $stmt->bindValue(':form_id', $formId, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return (bool) $stmt->fetch();
     }
 }
 /*

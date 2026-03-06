@@ -35,19 +35,6 @@ class SubmitService extends FormService
         $formId = (int)$postData['form_id'];
         $fields = $this->fields->findBy(['form_id' => $formId, 'field_type' => 'cpf'], [], true);
 
-        if ($fields) {
-            $fieldId = $fields['id'];
-            $cpfValue = preg_replace('/\D/', '', $postData['field_' . $fieldId] ?? '');
-
-            // 2. Verificar se este CPF já respondeu ESTE formulário específico
-            // Fazemos um JOIN manual ou usamos o repository para checar a existência
-            $alreadySubmitted = $this->values->checkDuplicateValue($formId, $fieldId, $cpfValue);
-
-            if ($alreadySubmitted) {
-                throw new \Exception("Este CPF já enviou uma resposta para este formulário. Só é permitida uma participação por pessoa.");
-            }
-        }
-
         // CPF Validation
         // 1. Localizar o campo do tipo CPF específico para este formulário
         $cpfField = $this->fields->findBy([
@@ -69,13 +56,14 @@ class SubmitService extends FormService
 
             // 3. Verificar duplicidade usando a sua nova lógica de contexto
             // Note que aqui usamos o field_id, que já é vinculado ao form_id
-            $alreadySubmitted = $this->values->existsBy([
-                'field_id'    => $cpfField['id'],
-                'field_value' => $cpf
-            ]);
+            $alreadySubmitted = $this->submissions->existsActiveByCpf(
+                $cpfField['id'],
+                $cpf,
+                (int) $postData['form_id']
+            );
 
             if ($alreadySubmitted) {
-                throw new \Exception("Já existe uma resposta registrada para este CPF neste formulário.");
+                throw new \Exception("Este CPF já enviou uma resposta para este formulário. Só é permitida uma participação por pessoa.");
             }
         }
 
