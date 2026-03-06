@@ -150,6 +150,11 @@ class SubmitService extends FormService
             throw new \Exception("Apenas arquivos PDF reais são permitidos.");
         }
 
+        $maxSize = 10 * 1024 * 1024; // 10MB
+        if ($file['size'] > $maxSize) {
+            throw new \Exception("O arquivo PDF não pode ser maior que 10MB.");
+        }
+
         if (!move_uploaded_file($file['tmp_name'], $destination)) {
             throw new \Exception("Falha ao mover o arquivo para o diretório de destino.");
         }
