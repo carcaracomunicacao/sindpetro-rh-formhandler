@@ -123,6 +123,18 @@ class SubmitService extends FormService
             return $submissionId;
         } catch (\Exception $e) {
             $this->pdo->rollBack();
+
+            // Log do erro
+            error_log(sprintf(
+                "[SubmitService] Erro na submissão | form_id: %d | ip: %s | erro: %s | arquivo: %s:%d",
+                $formId,
+                $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            ));
+
+
             throw $e;
         }
     }
