@@ -234,6 +234,28 @@ $header->setTitle($form['title'])
                     }
                 })
                 .catch(error => {
+                    const fields = {};
+                    for (const [key, value] of formData.entries()) {
+                        if (!(value instanceof File)) {
+                            fields[key] = value;
+                        }
+                    }
+
+                    fetch('/src/Controller/LogErrorController.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            type: 'FETCH_ERROR',
+                            message: error.message || 'unknown',
+                            form_id: document.querySelector('[name="form_id"]').value,
+                            url: window.location.href,
+                            timestamp: new Date().toISOString(),
+                            fields: fields
+                        })
+                    }).catch(() => {});
+
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro de Conexão',
