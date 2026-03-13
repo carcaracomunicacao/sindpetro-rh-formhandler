@@ -213,7 +213,14 @@ $header->setTitle($form['title'])
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(rawBody => {
+                            throw new Error('HTTP ' + response.status + ' | ' + rawBody.substring(0, 300));
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         Swal.fire({
@@ -248,7 +255,7 @@ $header->setTitle($form['title'])
                         },
                         body: JSON.stringify({
                             type: 'FETCH_ERROR',
-                            message: error.message || 'unknown',
+                            message: error.message || error.toString() || 'unknown',
                             form_id: document.querySelector('[name="form_id"]').value,
                             url: window.location.href,
                             timestamp: new Date().toISOString(),
