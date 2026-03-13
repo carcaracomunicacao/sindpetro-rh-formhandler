@@ -198,6 +198,9 @@ $header->setTitle($form['title'])
         document.getElementById('mainForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
+            const submitBtn = this.querySelector('[type="submit"]');
+            submitBtn.disabled = true;
+
             const formData = new FormData(this);
 
             Swal.fire({
@@ -241,6 +244,7 @@ $header->setTitle($form['title'])
                     }
                 })
                 .catch(error => {
+                    submitBtn.disabled = false;
                     const fields = {};
                     for (const [key, value] of formData.entries()) {
                         if (!(value instanceof File)) {
