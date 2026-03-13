@@ -32,11 +32,18 @@ try {
         'id' => $submissionId,
         'form_uuid' => $_POST['form_uuid']
     ]);
-} catch (\Exception $e) {
-    // Retorna o erro amigável para o SweetAlert mostrar
-    http_response_code(400);
+} catch (\Throwable $e) {  // Throwable pega também erros fatais, não só Exception
+    http_response_code(500);
     echo json_encode([
         'success' => false,
-        'message' => $e->getMessage()
+        'message' => 'Erro interno. Tente novamente.'  // mensagem genérica pro usuário
     ]);
+
+    error_log(sprintf(
+        "[SubmitController] erro | ip: %s | erro: %s | arquivo: %s:%d",
+        $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+        $e->getMessage(),
+        $e->getFile(),
+        $e->getLine()
+    ));
 }
