@@ -29,52 +29,31 @@ class SubmitService extends FormService
         $this->values = $values;
     }
 
-    private function logAttempt(string $status, int $formId, string $reason = ''): void
-    {
-        $logFile = __DIR__ . '/submit_attempts.log';
-        $ip      = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-        $ts      = date('Y-m-d H:i:s');
-        $line    = "[{$ts}] status={$status} | form_id={$formId} | ip={$ip}"
-            . ($reason ? " | motivo={$reason}" : '')
-            . PHP_EOL;
-
-        file_put_contents($logFile, $line, FILE_APPEND | LOCK_EX);
-    }
-
     public function handle(array $postData, array $files): int
     {
 
         $formId = (int)$postData['form_id'];
-<<<<<<< HEAD
         $fields = $this->fields->findBy(['form_id' => $formId, 'field_type' => 'cpf'], [], true);
 
         // CPF Validation
         // 1. Localizar o campo do tipo CPF específico para este formulário
-=======
->>>>>>> dev
         $cpfField = $this->fields->findBy([
             'form_id'    => (int)$postData['form_id'],
             'field_type' => 'cpf'
         ], [], true); // O 'true' garante que retorne apenas um registro (array), não uma lista
 
-        // Verificação de duplicidade (sem validação de formato ainda)
         if ($cpfField) {
-
+            // 2. Limpar e validar o formato do CPF
             $cpf = preg_replace('/\D/', '', $postData['field_' . $cpfField['id']] ?? '');
 
-            // 1. CPF Vazio
             if (empty($cpf)) {
-                $this->logAttempt('REJECTED', $formId, 'CPF não informado');
                 throw new \Exception("O campo CPF é obrigatório.");
             }
 
-            // 2. Formato inválido
             if (!$this->validateCPF($cpf)) {
-                $this->logAttempt('REJECTED', $formId, 'CPF inválido');
                 throw new \Exception("O número de CPF informado é inválido.");
             }
 
-<<<<<<< HEAD
             // 3. Verificar duplicidade usando a sua nova lógica de contexto
             // Note que aqui usamos o field_id, que já é vinculado ao form_id
             $alreadySubmitted = $this->submissions->existsActiveByCpf(
@@ -84,18 +63,9 @@ class SubmitService extends FormService
             );
 
             if ($alreadySubmitted) {
-=======
-            // 3. Duplicidade
-            $alreadySubmitted = $this->values->checkDuplicateValue($formId, $cpfField['id'], $cpf);
-            if ($alreadySubmitted) {
-                $this->logAttempt('REJECTED', $formId, 'CPF duplicado (checkDuplicateValue)');
->>>>>>> dev
                 throw new \Exception("Este CPF já enviou uma resposta para este formulário. Só é permitida uma participação por pessoa.");
             }
         }
-
-        // Passou todas as validações — registra tentativa e entra na transação
-        $this->logAttempt('ATTEMPT', $formId);
 
         try {
             $this->pdo->beginTransaction();
@@ -150,11 +120,9 @@ class SubmitService extends FormService
             }
 
             $this->pdo->commit();
-            $this->logAttempt('SUCCESS', $formId, "submission_id={$submissionId}");
             return $submissionId;
         } catch (\Exception $e) {
             $this->pdo->rollBack();
-<<<<<<< HEAD
 
             // Log do erro
             error_log(sprintf(
@@ -167,9 +135,6 @@ class SubmitService extends FormService
             ));
 
 
-=======
-            $this->logAttempt('ERROR', $formId, $e->getMessage());
->>>>>>> dev
             throw $e;
         }
     }
@@ -194,7 +159,6 @@ class SubmitService extends FormService
         finfo_close($finfo);
 
         if ($mime !== 'application/pdf') {
-            $this->logAttempt('UPLOAD_REJECTED', $formId, "MIME inválido: {$mime} | field_id={$fieldId}");
             throw new \Exception("Apenas arquivos PDF reais são permitidos.");
         }
 
@@ -204,11 +168,9 @@ class SubmitService extends FormService
         }
 
         if (!move_uploaded_file($file['tmp_name'], $destination)) {
-            $this->logAttempt('UPLOAD_ERROR', $formId, "Falha ao mover arquivo | field_id={$fieldId} | destino={$destination}");
             throw new \Exception("Falha ao mover o arquivo para o diretório de destino.");
         }
 
-        $this->logAttempt('UPLOAD_SUCCESS', $formId, "arquivo={$newFileName} | field_id={$fieldId} | submission_id={$submissionId}");
         return $newFileName;
     }
 

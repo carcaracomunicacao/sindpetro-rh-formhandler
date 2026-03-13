@@ -198,9 +198,6 @@ $header->setTitle($form['title'])
         document.getElementById('mainForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const submitBtn = this.querySelector('[type="submit"]');
-            submitBtn.disabled = true;
-
             const formData = new FormData(this);
 
             Swal.fire({
@@ -216,14 +213,7 @@ $header->setTitle($form['title'])
                     method: 'POST',
                     body: formData
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(rawBody => {
-                            throw new Error('HTTP ' + response.status + ' | ' + rawBody.substring(0, 300));
-                        });
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         Swal.fire({
@@ -244,29 +234,6 @@ $header->setTitle($form['title'])
                     }
                 })
                 .catch(error => {
-                    submitBtn.disabled = false;
-                    const fields = {};
-                    for (const [key, value] of formData.entries()) {
-                        if (!(value instanceof File)) {
-                            fields[key] = value;
-                        }
-                    }
-
-                    fetch('/src/Controller/LogErrorController.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            type: 'FETCH_ERROR',
-                            message: error.message || error.toString() || 'unknown',
-                            form_id: document.querySelector('[name="form_id"]').value,
-                            url: window.location.href,
-                            timestamp: new Date().toISOString(),
-                            fields: fields
-                        })
-                    }).catch(() => {});
-
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro de Conexão',
