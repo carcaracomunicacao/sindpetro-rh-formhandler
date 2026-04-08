@@ -58,20 +58,20 @@ class SubmitService extends FormService
             // 1. CPF Vazio
             if (empty($cpf)) {
                 $this->logAttempt('REJECTED', $formId, 'CPF não informado');
-                throw new \Exception("O campo CPF é obrigatório.");
+                throw new \Exception("O campo CPF é obrigatório.", 422);
             }
 
             // 2. Formato inválido
             if (!$this->validateCPF($cpf)) {
                 $this->logAttempt('REJECTED', $formId, 'CPF inválido');
-                throw new \Exception("O número de CPF informado é inválido.");
+                throw new \Exception("O número de CPF informado é inválido.", 422);
             }
 
             // 3. Duplicidade
             $alreadySubmitted = $this->values->checkDuplicateValue($formId, $cpfField['id'], $cpf);
             if ($alreadySubmitted) {
                 $this->logAttempt('REJECTED', $formId, 'CPF duplicado (checkDuplicateValue)');
-                throw new \Exception("Este CPF já enviou uma resposta para este formulário. Só é permitida uma participação por pessoa.");
+                throw new \Exception("Este CPF já enviou uma resposta para este formulário. Só é permitida uma participação por pessoa.", 422);
             }
         }
 

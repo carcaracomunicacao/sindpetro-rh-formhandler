@@ -32,18 +32,25 @@ try {
         'id' => $submissionId,
         'form_uuid' => $_POST['form_uuid']
     ]);
-} catch (\Throwable $e) {  // Throwable pega também erros fatais, não só Exception
-    http_response_code(500);
+} catch (\Throwable $e) {
+    // Throwable pega também erros fatais, não só Exception
+    $isValidation = $e->getCode() === 422;
+
+    http_response_code($isValidation ? 422 : 500);
     echo json_encode([
         'success' => false,
-        'message' => 'Erro interno. Tente novamente.'  // mensagem genérica pro usuário
+        'message' => $isValidation
+            ? $e->getMessage()
+            : 'Erro interno. Tente novamente.'
     ]);
 
-    error_log(sprintf(
-        "[SubmitController] erro | ip: %s | erro: %s | arquivo: %s:%d",
-        $_SERVER['REMOTE_ADDR'] ?? 'unknown',
-        $e->getMessage(),
-        $e->getFile(),
-        $e->getLine()
-    ));
+    if (!$isValidation) {
+        error_log(sprintf(
+            "[SubmitController] erro | ip: %s | erro: %s | arquivo: %s:%d",
+            $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine()
+        ));
+    }
 }
