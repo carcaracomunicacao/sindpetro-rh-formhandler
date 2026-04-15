@@ -33,11 +33,21 @@ $header->setTitle($form['title'])
     ->setDescription($form['description'])
     ->setOgImage($form['og_image'] ?? '');
 
-if (!$form['is_active']) {
+
+date_default_timezone_set('America/Sao_Paulo');
+$now = new DateTime();
+$form2Deadline = new DateTime('2026-04-15 18:00:00');
+
+if (
+    !$form['is_active'] ||
+    ($form['id'] == 2 && $now >= $form2Deadline)
+    ) {
     if ($form['id'] == 1) {
         include __DIR__ . '/forme-closed-oposicao.php';
     } elseif ($form['id'] == 2) {
-        include __DIR__ . '/form-closed.php';
+        include __DIR__ . '/form-closed-assistencia.php';
+    } else {
+        include __DIR__ . '/form-closed.php'; // fallback
     }
     exit;
 }

@@ -18,7 +18,7 @@
         </h4>
 
         <p class="text-muted mb-3">
-            Informamos que o prazo legal para oposição à Contribuição Assistencial encerrou-se no dia <strong>14/04</strong>, conforme o ACT e normativos vigentes.
+            Informamos que o prazo para oposição à Contribuição Assistencial encerrou-se no dia <strong>14/04</strong>, conforme o ACT e normativos vigentes.
         </p>
 
         <p class="text-muted mb-4">
