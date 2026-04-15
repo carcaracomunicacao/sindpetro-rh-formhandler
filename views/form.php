@@ -32,6 +32,11 @@ $header = new HeaderBuilder();
 $header->setTitle($form['title'])
     ->setDescription($form['description'])
     ->setOgImage($form['og_image'] ?? '');
+
+    if (!$form['is_active']) {
+    include __DIR__ . '/form-closed.php';
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
