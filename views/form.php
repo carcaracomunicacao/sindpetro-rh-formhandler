@@ -33,8 +33,12 @@ $header->setTitle($form['title'])
     ->setDescription($form['description'])
     ->setOgImage($form['og_image'] ?? '');
 
-    if (!$form['is_active']) {
-    include __DIR__ . '/form-closed.php';
+if (!$form['is_active']) {
+    if ($form['id'] == 1) {
+        include __DIR__ . '/forme-closed-oposicao.php';
+    } elseif ($form['id'] == 2) {
+        include __DIR__ . '/form-closed.php';
+    }
     exit;
 }
 ?>
