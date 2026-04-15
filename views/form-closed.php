@@ -8,6 +8,7 @@
 <body class="bg-light d-flex align-items-center justify-content-center" style="min-height:100vh;">
 
     <div class="text-center p-5 bg-white shadow rounded" style="max-width: 500px;">
+        <img src="/assets/img/sindpedro-logo.jpg" style="padding:16px; max-width:65%; margin: auto">
         
         <h2 class="fw-bold mb-3">
             <?= htmlspecialchars($form['title']) ?>
