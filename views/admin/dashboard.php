@@ -28,7 +28,7 @@ $formService = new FormService(
     new FormFieldsRepository($db),
     new FieldOptionsRepository($db)
 );
-$allForms = $formService->getAllActiveForms();
+$allForms = $formService->getAll();
 
 // Configuração da Paginação
 $limit = isset($_GET['per_page']) && in_array((int)$_GET['per_page'], [15, 30, 60, 120, 240])
