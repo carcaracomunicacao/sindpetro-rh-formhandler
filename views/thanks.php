@@ -35,8 +35,8 @@ $formId = $_GET['id'] ?? null;
 
                         <div class="alert alert-info border-0 bg-light text-start small">
                             <strong>O que acontece agora?</strong><br>
-                            Seus dados e o comprovante (PDF) passarão por uma conferência.
-                            Caso haja alguma divergência, entraremos em contato via e-mail.
+                            Seus dados passarão por uma conferência.
+                            Caso haja alguma dúvida, entraremos em contato.
                         </div>
 
                         <hr class="my-4 opacity-25">
